@@ -50,6 +50,7 @@ const Dashboard = () => {
           gridColumn="span 12"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          overflow="hidden"
         >
           <Box
             mt="25px"
@@ -112,6 +113,7 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          overflow="hidden"
         >
           <Box
             mt="25px"
@@ -144,6 +146,7 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          overflow="hidden"
         >
           <Box
             mt="25px"
@@ -173,13 +176,13 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
-          // padding="30px"
+          overflow="hidden"
         >
-          <Box
+          {/* <Box
             gridColumn="span 8"
             gridRow="span 2"
             backgroundColor={colors.primary[400]}
-          >
+          > */}
             <Box
               mt="25px"
               p="0 30px"
@@ -200,10 +203,10 @@ const Dashboard = () => {
               </div>
             
             </Box>
-            <Box height="200px" m="-20px 0 0 0">
+            <Box height="250px" mt="-20px">
               <DeviceAppointList isDashboard={true} Data={Data?.appoint}/>
             </Box>
-          </Box>
+          {/* </Box> */}
         
         </Box>
       </Box>

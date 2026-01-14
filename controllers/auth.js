@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt')
-const axios = require('axios')
+const axios = require('axios');
+const jwtMiddleware = require('../middlewares/jwt')
+// const e = require('express');
 require('dotenv').config({ path:'../.env'});
 
 
@@ -68,28 +70,41 @@ const authenticate = async (request, response, next) => {
         
         
         try{
-            comfirm = await axios({
+            const comfirm = await axios({
                 method:'POST',
                 url:process.env.OCPPURL.concat('/login'),
                 data: {
                     email: email,
                     pwd: password
-                }   
+                },
             })
 
 
             const data = comfirm.data.item
 
+            // const data = jwtMiddleware.callGoAPI(request,'POST','/login',{email: email,pwd: password},null)
+
     
-            if(data.name != ''&& data.email != ''){
-                let userInfo = {
-                    name:data.name,
+            if(data.success){
+                const userInfo = {
                     email:data.email,
                 }
 
+                const tokenInfo = {
+                    access_token:data.token_pair.access_token,
+                    refresh_token:data.token_pair.refresh_token,
+                    expires_in:Date.now() + (data.token_pair.expires_in * 1000) // milliseconds화 하여 만료시간 계산 후 저장 
+                }
+
+                // console.log("login success : "+data.email);
+
             
                 request.session.user = userInfo
+                request.session.tokens = tokenInfo
                 await request.session.save()
+
+                console.log("User logged in:", request.session.user.email);
+
                 sendAuthenticateData.isLogin = true
                 response.send(sendAuthenticateData)
             }else{
@@ -122,7 +137,7 @@ const authenticate = async (request, response, next) => {
 }
 
 // sign out user
-const signOut = (request, response, next) => {
+const signOut = async (request, response, next) => {
     console.log('c_auth signout')
 
     const sendAuthenticateData = {
@@ -130,12 +145,38 @@ const signOut = (request, response, next) => {
         errorMessage :""
     };
 
-    request.session.destroy()
+    try{
+        // const comfirm = await axios({
+        //     method:'POST',
+        //     url:process.env.OCPPURL.concat('/logout'),
+        //     data: {
+        //         email: request.session.user.email,
+        //         refresh_token: request.session.tokens.refresh_token
+        //     }   
+        // })
 
 
-    // return response.redirect(response.locals.base)
-    sendAuthenticateData.isLogout = true
-    response.send(sendAuthenticateData)
+        // const data = comfirm.data
+
+        const data = await jwtMiddleware.callGoAPI(request,'POST','/logout',{ email: request.session.user.email,refresh_token: request.session.tokens.refresh_token},null)
+
+        sendAuthenticateData.isLogout = data.success
+
+        request.session.destroy()
+
+        if(data.success){
+            response.send(sendAuthenticateData)
+        }else{
+            sendAuthenticateData.errorMessage = "서버와의 연결이 불안정합니다."
+            response.send(sendAuthenticateData)
+        }
+    }catch(e){
+        sendAuthenticateData.isLogout = false
+        sendAuthenticateData.errorMessage = "서버와의 연결이 불안정합니다."
+        response.send(sendAuthenticateData)
+    }
+
+
 }
 
 const getAlarmList = async (request, response, next) => {
@@ -144,15 +185,19 @@ const getAlarmList = async (request, response, next) => {
     let result = []
 
     try{
-        comfirm = await axios({
-            method:'GET',
-            url:process.env.OCPPURL.concat('/user/alarmlist'),
-            headers: { Authorization: `Bearer ${request.session.user.name}` },
-            params:{user:request.session.user.email}
-        })
+        // const comfirm = await axios({
+        //     method:'GET',
+        //     url:process.env.OCPPURL.concat('/user/alarmlist'),
+        //     headers: { Authorization: `Bearer ${request.session.tokens.access_token}` },
+        //     params:{user:request.session.user.email}
+        // })
         
-        response.send(comfirm.data);
+        // response.send(comfirm.data);
         
+        const result = await jwtMiddleware.callGoAPI(request,'GET','/user/alarmlist',null,{user:request.session.user.email})
+        
+        response.send(result);
+
     }catch(e){
         if(e.response?.status==401){
             request.session.destroy()

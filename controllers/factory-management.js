@@ -1,21 +1,25 @@
 // const dbc = require('../db/dbc')
-const axios = require('axios')
+// const axios = require('axios')
+const jwtMiddleware = require('../middlewares/jwt')
 require('dotenv').config({ path:'../.env'});
 
 const getdevicelist = async (request, response, next) => {  
     console.log('c_getdevicelist')
 
-    let result = []
 
     try{
-        comfirm = await axios({
-            method:'GET',
-            url:process.env.OCPPURL.concat('/devicelist'),
-            headers: { Authorization: `Bearer ${request.session.user.name}` },
-            params:{user:request.session.user.email,s_order:request.params.s_order,e_order:request.params.e_order},
-        })
+        // const comfirm = await axios({
+        //     method:'GET',
+        //     url:process.env.OCPPURL.concat('/devicelist'),
+        //     headers: { Authorization: `Bearer ${request.session.tokens.access_token}` },
+        //     params:{user:request.session.user.email,s_order:request.params.s_order,e_order:request.params.e_order},
+        // })
 
-        response.send(comfirm.data);
+        // response.send(comfirm.data);
+
+        const result = await jwtMiddleware.callGoAPI(request,'GET','/devicelist',null,{user:request.session.user.email,s_order:request.params.s_order,e_order:request.params.e_order})
+        
+        response.send(result);
         
     }catch(e){
         if(e.response?.status==401){
@@ -23,7 +27,7 @@ const getdevicelist = async (request, response, next) => {
             response.send(401)
         }else{
             console.log("err : "+e);
-            response.send(result);
+            response.send([]);
         }
     }
 
@@ -33,8 +37,6 @@ const getdevicelist = async (request, response, next) => {
 
 const getdevicelist_search = async (request, response, next) => {  
     console.log('c_getdevicelist_search')
-
-    let result = []
 
     let d
 
@@ -60,14 +62,18 @@ const getdevicelist_search = async (request, response, next) => {
     }
 
     try{
-        comfirm = await axios({
-            method:'GET',
-            url:process.env.OCPPURL.concat('/devicelist/search'),
-            headers: { Authorization: `Bearer ${request.session.user.name}` },
-            params:{user:request.session.user.email,column:request.params.column,data:d},
-        })
+        // const comfirm = await axios({
+        //     method:'GET',
+        //     url:process.env.OCPPURL.concat('/devicelist/search'),
+        //     headers: { Authorization: `Bearer ${request.session.tokens.access_token}` },
+        //     params:{user:request.session.user.email,column:request.params.column,data:d},
+        // })
 
-        response.send(comfirm.data);
+        // response.send(comfirm.data);
+
+        const result = await jwtMiddleware.callGoAPI(request,'GET','/devicelist/search',null,{user:request.session.user.email,column:request.params.column,data:d})
+        
+        response.send(result);
         
     }catch(e){
         if(e.response?.status==401){
@@ -75,7 +81,7 @@ const getdevicelist_search = async (request, response, next) => {
             response.send(401)
         }else{
             console.log("err : "+e);
-            response.send(result);
+            response.send([]);
         }
     }
 
@@ -84,27 +90,30 @@ const getdevicelist_search = async (request, response, next) => {
 const getdeviceappointlist = async (request, response, next) => {
     console.log('c_getdeviceappointlist')
 
-    let result = []
+    // let result = []
 
-    let comfirm;            /// ocpp 연결 여부 
     try{
-        comfirm = await axios({
-            method:'GET',
-            url:process.env.OCPPURL.concat('/deviceappointlist'),
-            headers: { Authorization: `Bearer ${request.session.user.name}` },
-            params:{user:request.session.user.email},
-        })
+        // const comfirm = await axios({
+        //     method:'GET',
+        //     url:process.env.OCPPURL.concat('/deviceappointlist'),
+        //     headers: { Authorization: `Bearer ${request.session.tokens.access_token}` },
+        //     params:{user:request.session.user.email},
+        // })
 
-        response.send(comfirm.data);
+        // response.send(comfirm.data);
 
     
+        const result = await jwtMiddleware.callGoAPI(request,'GET','/deviceappointlist',null,{user:request.session.user.email})
+        
+        response.send(result);
+
     }catch(e){
         if(e.response?.status==401){
             request.session.destroy()
             response.send(401)
         }else{
             console.log("err : "+e);
-            response.send(result);
+            response.send([]);
         }
     }
 
@@ -119,18 +128,19 @@ const getdeviceappointlist = async (request, response, next) => {
 const getdeviceappointlist_search = async (request, response, next) => {
     console.log('c_getdeviceappointlist_search')
 
-    let result = []
-
-    let comfirm;            /// ocpp 연결 여부 
     try{
-        comfirm = await axios({
-            method:'GET',
-            url:process.env.OCPPURL.concat('/deviceappointlist/search'),
-            headers: { Authorization: `Bearer ${request.session.user.name}` },
-            params:{id:request.params.device},
-        })
+        // const comfirm = await axios({
+        //     method:'GET',
+        //     url:process.env.OCPPURL.concat('/deviceappointlist/search'),
+        //     headers: { Authorization: `Bearer ${request.session.tokens.access_token}` },
+        //     params:{id:request.params.device},
+        // })
 
-        response.send(comfirm.data);
+        // response.send(comfirm.data);
+
+        const result = jwtMiddleware.callGoAPI(request,'GET','/deviceappointlist/search',null,{id:request.params.device})
+        
+        response.send(result);
 
     
     }catch(e){
@@ -139,7 +149,7 @@ const getdeviceappointlist_search = async (request, response, next) => {
             response.send(401)
         }else{
             console.log("err : "+e);
-            response.send(result);
+            response.send([]);
         }
     }
 
@@ -158,18 +168,21 @@ const rebootsoftware = async (request, response, next) =>{
     if(id){
 
         try{
-            comfirm = await axios({
-                method:'POST',
-                url:process.env.OCPPURL+'/command/rbsw',
-                headers:{
-                    Authorization: `Bearer ${request.session.user.name}`,
-                },
-                data:{
-                   id:id,
-                }
-            })
+            // const comfirm = await axios({
+            //     method:'POST',
+            //     url:process.env.OCPPURL+'/command/rbsw',
+            //     headers:{
+            //         Authorization: `Bearer ${request.session.tokens.access_token}`,
+            //     },
+            //     data:{
+            //        id:id,
+            //     }
+            // })
             
-            const getData = comfirm.data
+            // const getData = comfirm.data
+
+            const getData = await jwtMiddleware.callGoAPI(request,'POST','/command/rbsw',{id:id},null)
+        
 
             if(getData.id == id){
                 if(getData.result == true){
@@ -218,18 +231,20 @@ const reboothardware = async (request, response, next) =>{
     if(id){
 
         try{
-            comfirm = await axios({
-                method:'POST',
-                url:process.env.OCPPURL+'/command/rbhw',
-                headers:{
-                    Authorization: `Bearer ${request.session.user.name}`,
-                },
-                data:{
-                   id:id,
-                }
-            })
+            // const comfirm = await axios({
+            //     method:'POST',
+            //     url:process.env.OCPPURL+'/command/rbhw',
+            //     headers:{
+            //         Authorization: `Bearer ${request.session.tokens.access_token}`,
+            //     },
+            //     data:{
+            //        id:id,
+            //     }
+            // })
             
-            const getData = comfirm.data
+            // const getData = comfirm.data
+
+            const getData = await jwtMiddleware.callGoAPI(request,'POST','/command/rbhw',{id:id},null)
 
             if(getData.id == id){
                 if(getData.result == true){
@@ -280,26 +295,26 @@ const onoffsettings = async (request, response, next) =>{
     if(id&&key){
 
         try{
-            comfirm = await axios({
-                method:'POST',
-                url:process.env.OCPPURL+'/command/nf',
-                // headers:{
-                //     'content-type':'application/x-www-form-urlencoded;charset=utf-8',
-                //     Authorization: `Bearer ${token.data.access_token}`
-                // },
-                headers:{
-                    Authorization: `Bearer ${request.session.user.name}`,
-                },
-                data:{
-                   id:id,
-                   key:key,
-                   value:value
-                }
-            })
+            // const comfirm = await axios({
+            //     method:'POST',
+            //     url:process.env.OCPPURL+'/command/nf',
+            //     // headers:{
+            //     //     'content-type':'application/x-www-form-urlencoded;charset=utf-8',
+            //     //     Authorization: `Bearer ${token.data.access_token}`
+            //     // },
+            //     headers:{
+            //         Authorization: `Bearer ${request.session.tokens.access_token}`,
+            //     },
+            //     data:{
+            //        id:id,
+            //        key:key,
+            //        value:value
+            //     }
+            // })
 
+            // const getData = comfirm.data
 
-            
-            const getData = comfirm.data
+            const getData = await jwtMiddleware.callGoAPI(request,'POST','/command/nf',{id:id,key:key,value:value},null)
 
             if(getData.id == id){
                 if(getData.result == true){
@@ -361,27 +376,27 @@ const appointupdate = async (request, response, next) =>{
 
         try{
 
-            comfirm = await axios({
-                method:'POST',
-                url:process.env.OCPPURL.concat('/app/cmd/appoint/',name),
-                // headers:{
-                //     'content-type':'application/x-www-form-urlencoded;charset=utf-8',
-                //     Authorization: `Bearer ${token.data.access_token}`
-                // },
-                headers:{
-                    Authorization: `Bearer ${request.session.user.name}`,
-                },
-                data:{
-                   id:id,
-                   startt:startt,
-                   stopt:stopt,
-                   onoff:('true'==onoff)
-                }
-            })
-
-
+            // const comfirm = await axios({
+            //     method:'POST',
+            //     url:process.env.OCPPURL.concat('/app/cmd/appoint/',name),
+            //     // headers:{
+            //     //     'content-type':'application/x-www-form-urlencoded;charset=utf-8',
+            //     //     Authorization: `Bearer ${token.data.access_token}`
+            //     // },
+            //     headers:{
+            //         Authorization: `Bearer ${request.session.tokens.access_token}`,
+            //     },
+            //     data:{
+            //        id:id,
+            //        startt:startt,
+            //        stopt:stopt,
+            //        onoff:('true'==onoff)
+            //     }
+            // })
             
-            const getData = comfirm.data
+            // const getData = comfirm.data
+
+            const getData = await jwtMiddleware.callGoAPI(request,'POST','/app/cmd/appoint/'.concat(name),{id:id,startt:startt,stopt:stopt,onoff:('true'==onoff)},null)
 
             if(getData.id == id){
                 if(getData.result == true){

@@ -1,23 +1,25 @@
-const axios = require('axios')
+// const axios = require('axios')
+const jwtMiddleware = require('../middlewares/jwt')
 require('dotenv').config({ path:'../.env'});
 
 
 
 const getdevice_daily_list = async (request, response, next) => {
     console.log('c_getdevice_daily_list')
-
-    let result = []
-
-    let comfirm;            /// ocpp 연결 여부 
+     
     try{
-        comfirm = await axios({
-            method:'GET',
-            url:process.env.OCPPURL.concat('/devicedailylist'),
-            headers: { Authorization: `Bearer ${request.session.user.name}` },
-            params:{user:request.session.user.email,s_order:request.params.s_order,e_order:request.params.e_order},
-        })
+        // const comfirm = await axios({
+        //     method:'GET',
+        //     url:process.env.OCPPURL.concat('/devicedailylist'),
+        //     headers: { Authorization: `Bearer ${request.session.tokens.access_token}` },
+        //     params:{user:request.session.user.email,s_order:request.params.s_order,e_order:request.params.e_order},
+        // })
 
-        response.send(comfirm.data);
+        // response.send(comfirm.data);
+
+        const result = await jwtMiddleware.callGoAPI(request,'GET','/devicedailylist',null,{user:request.session.user.email,s_order:request.params.s_order,e_order:request.params.e_order})
+
+        response.send(result);
     }catch(e){
         
         if(e.response?.status==401){
@@ -25,7 +27,7 @@ const getdevice_daily_list = async (request, response, next) => {
             response.send(401)
         }else{
             console.log("err : "+e);
-            response.send(result);
+            response.send([]);
         }
     }
 
@@ -35,25 +37,28 @@ const getdevice_daily_list = async (request, response, next) => {
 const getdevice_daily_list_search = async (request, response, next) => {
     console.log('c_getdevice_daily_list_search')
 
-    let result = []
-
-    let comfirm;            /// ocpp 연결 여부 
     try{
-        comfirm = await axios({
-            method:'GET',
-            url:process.env.OCPPURL.concat('/devicedailylist/search'),
-            headers: { Authorization: `Bearer ${request.session.user.name}` },
-            params:{user:request.session.user.email,column:request.params.column,data:request.params.data},
-        })
+        // const comfirm = await axios({
+        //     method:'GET',
+        //     url:process.env.OCPPURL.concat('/devicedailylist/search'),
+        //     headers: { Authorization: `Bearer ${request.session.tokens.access_token}` },
+        //     params:{user:request.session.user.email,column:request.params.column,data:request.params.data},
+        // })
 
-        response.send(comfirm.data);
+        // response.send(comfirm.data);
+
+
+        const result = await jwtMiddleware.callGoAPI(request,'GET','/devicedailylist/search',null,{user:request.session.user.email,column:request.params.column,data:request.params.data})
+
+        response.send(result);
+
     }catch(e){
         if(e.response?.status==401){
             request.session.destroy()
             response.send(401)
         }else{
             console.log("err : "+e);
-            response.send(result);
+            response.send([]);
         }
     }
 
@@ -71,7 +76,7 @@ const getdevice_daily_list_search = async (request, response, next) => {
 //         comfirm = await axios({
 //             method:'GET',
 //             url:process.env.OCPPURL.concat('/chargedailygraphlist'),
-//             headers: { Authorization: `Bearer ${request.session.user.name}` }
+//             headers: { Authorization: `Bearer ${request.session.tokens.access_token}` }
 //         })
 //         // console.log(comfirm.data)
 
@@ -110,64 +115,33 @@ const getdevice_daily_graph = async (request, response, next) => {
     const Device = request.body.id
     // const DeviceType = request.body.devicetype
 
-    let listResult = []
-    let result = []
 
-
-    let comfirm;            /// ocpp 연결 여부 
     try{
-        comfirm = await axios({
-            method:'POST',
-            url:process.env.OCPPURL.concat('/devicedailygraph'),
-            headers: { Authorization: `Bearer ${request.session.user.name}` },
-            params:{user:request.session.user.email},
-            data: {
-                starttime: StartTime,
-                endtime: EndTime,
-                id: Device
-            } 
-        })
-        // console.log(comfirm.data)
-
-        // const listrows = comfirm.data.listitem
-
-        // for(i = 0; i < listrows.length; i ++){
-    
-        //     const sendcharge_daily_list_GraphData ={
-        //         id: listrows[i].id,
-        //     }
-    
-    
-        //     listResult.push(sendcharge_daily_list_GraphData)
-        // }
-
-        // const rows = comfirm.data.item
-
-        // for(i = 0; i < rows.length; i ++){
-        //     if(rows[i].time == null){
-        //         continue;
-        //     }
-    
-        //     const sendcharge_daily_GraphData ={
-        //         time: rows[i].time,
-        //         amount: rows[i].amount,
-        //         count:rows[i].count,
-        //         pay:rows[i].pay,
-        //     }
-    
-        //     // console.log(rows[i].time)
-    
-        //     result.push(sendcharge_daily_GraphData)
-        // }
+        // const comfirm = await axios({
+        //     method:'POST',
+        //     url:process.env.OCPPURL.concat('/devicedailygraph'),
+        //     headers: { Authorization: `Bearer ${request.session.tokens.access_token}` },
+        //     params:{user:request.session.user.email},
+        //     data: {
+        //         starttime: StartTime,
+        //         endtime: EndTime,
+        //         id: Device
+        //     } 
+        // })
         
-        response.send({item:comfirm.data.item,listitem:comfirm.data.listitem});
+        // response.send({item:comfirm.data.item,listitem:comfirm.data.listitem});
+
+
+        const result = await jwtMiddleware.callGoAPI(request,'POST','/devicedailygraph', {starttime: StartTime,endtime: EndTime,id: Device} ,{user:request.session.user.email})
+        response.send(result);
+
     }catch(e){
         if(e.response?.status==401){
             request.session.destroy()
             response.send(401)
         }else{
             console.log("err : "+e);
-            response.send({item:result,listitem:listResult});
+            response.send({item:[],listitem:[]});
         }
     }
     // const rows = await dbc.getcharge_daily_graph(StartTime,EndTime)

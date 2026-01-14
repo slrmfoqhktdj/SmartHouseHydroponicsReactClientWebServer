@@ -112,11 +112,13 @@ const DeviceBarChart = () => {
         anchorEl={anchorEl}
         open={open}
         onClose={closePositionMenu}
-        PaperProps={{
-          style: {
+        slotProps={{
+          paper: {
+            style: {
             maxHeight: MENU_MAX_HEIGHT,
             width: '20ch',
-          },
+            },
+          }
         }}
       >
         <MenuItem key="전체" selected={"전체" === Device} onClick={()=> {closePositionMenu(); setDevice("전체")}}>

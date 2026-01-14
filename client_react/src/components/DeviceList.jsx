@@ -468,7 +468,7 @@ function DeviceList({ isDashboard = false , Data, setMounted ,TablePaginationFun
           rows={Data&&Data.length? Data:[]} 
           columns={isDashboard? columns.slice(0,-1):columns}  
           hideFooter={isDashboard}
-          components={IsSearch?{Toolbar: CustomToolBar}:{ Toolbar: isDashboard? null:CustomToolBar , Pagination : isDashboard? null:TablePaginationFunc}} 
+          slots={IsSearch?{Toolbar: CustomToolBar}:{ Toolbar: isDashboard? null:CustomToolBar , Pagination : isDashboard? null:TablePaginationFunc}} 
           // componentsProps={{
           //   panel: {
           //     sx: {

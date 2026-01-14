@@ -68,13 +68,14 @@ function CustomTableSearcherAppoint({MenuList = [], SearchHandle}){
                 anchorEl={anchorEl}
                 open={open}
                 onClose={closePositionMenu}
-                PaperProps={{
-                style: {
+                slotProps={{
+                  paper: {
+                    style: {
                     maxHeight: 150,
                     width: '20ch',
-                },
-                }}
-                
+                    },
+                  }
+              }}    
             >
 
             {

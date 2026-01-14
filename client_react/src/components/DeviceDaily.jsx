@@ -122,7 +122,7 @@ const DeviceDaily = ({ isDashboard = false, Data ,TablePaginationFunc,SearchHand
           //   },
           // }}
           getRowId={(row)=> row.time}
-          components={IsSearch?{Toolbar: CustomToolBar}:{ Toolbar: isDashboard? null:CustomToolBar , Pagination : isDashboard? null:TablePaginationFunc}} 
+          slots={IsSearch?{Toolbar: CustomToolBar}:{ Toolbar: isDashboard? null:CustomToolBar , Pagination : isDashboard? null:TablePaginationFunc}} 
           disableColumnMenu
           disableColumnFilter
         />

@@ -34,7 +34,6 @@ const FilecheckStatusAndParse = response => {
 }
 
 export const fetchMainGet = async(url) =>{
-
     return await fetch(`${process.env.REACT_APP_BACKURL}${url}`,{
         credentials: 'include'
     }).then(checkMainStatusAndParse)

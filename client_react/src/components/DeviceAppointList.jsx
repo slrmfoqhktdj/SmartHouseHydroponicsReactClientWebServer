@@ -388,7 +388,7 @@ const DeviceAppointList = ({ isDashboard = false , Data = null, Deviceid = null}
           getRowId={(row)=>row.name}
           columns={isDashboard? columns.slice(0,-1):columns} 
           hideFooter={isDashboard} 
-          components={{Pagination : null}} 
+          slots={{Pagination : null}} 
           disableColumnMenu
           disableColumnFilter
           />
